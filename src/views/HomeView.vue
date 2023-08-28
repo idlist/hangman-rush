@@ -181,7 +181,7 @@ const copyToClipboard = () => {
         <button
           class="btn-remove"
           @click="() => { removeEntry(i) }">
-          <img class="btn-remove__icon" :src="iconRemove" />
+          <img class="btn-remove__icon" :src="iconRemove" alt="remove" />
         </button>
       </div>
     </div>
