@@ -98,15 +98,21 @@ const output = computed(() => {
       return
     }
 
-    let segment = e.guessed ? '√. ' : `${i + 1}. `
+    let segment: string
 
-    for (const letter of e.content) {
-      if (checkers.includes(letter.toLowerCase())) {
-        segment += letter
-      } else if (Whitespaces.includes(letter)) {
-        segment += letter
-      } else {
-        segment += '*'
+    if (e.guessed) {
+      segment = `√. ${e.content}`
+    } else {
+      segment = `${i + 1}. `
+
+      for (const letter of e.content) {
+        if (checkers.includes(letter.toLowerCase())) {
+          segment += letter
+        } else if (Whitespaces.includes(letter)) {
+          segment += ' '
+        } else {
+          segment += '*'
+        }
       }
     }
 
