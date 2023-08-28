@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+
 import iconTick from '@/assets/tick.svg'
 import iconHide from '@/assets/hide.svg'
 import iconShow from '@/assets/show.svg'
-import iconDelete from '@/assets/delete.svg'
+import iconRemove from '@/assets/remove.svg'
 import iconAdd from '@/assets/add.svg'
+import iconClear from '@/assets/clear.svg'
+import iconSort from '@/assets/sort.svg'
 
 interface HangmanEntry {
   content: string
@@ -28,7 +31,7 @@ const toggleHided = (i: number) => {
   entries.value[i].hided = !entries.value[i].hided
 }
 
-const deleteEntry = (i: number) => {
+const removeEntry = (i: number) => {
   entries.value.splice(i, 1)
 }
 
@@ -40,12 +43,25 @@ const addEntry = () => {
   })
 }
 
+const clearEntries = () => {
+  entries.value.forEach((e) => {
+    e.content = ''
+    e.guessed = false
+    e.hided = false
+  })
+}
+
+const removeAllEntries = () => {
+  entries.value.splice(0)
+  addEntry()
+}
+
 const allGuessed = ref<boolean>(false)
 
 const toggleAllGuessed = () => {
   const next = !allGuessed.value
   allGuessed.value = next
-  entries.value.forEach((i) => { i.guessed = next })
+  entries.value.forEach((e) => { e.guessed = next })
 }
 
 const sortEntries = () => {
@@ -57,11 +73,31 @@ const sortEntries = () => {
     }
   })
 }
+
+// const clear
+
+const opened = ref<string>('')
 </script>
 
 <template>
   <div class="hangman-list">
     <div class="hangman-list__title">列表</div>
+
+    <div class="hangman-item actions">
+      <button class="btn-add" @click="() => { addEntry() }">
+        <img class="btn-add__icon" :src="iconAdd" alt="add" />
+        新增
+      </button>
+      <div class="hangman-item__blank"></div>
+      <button class="btn-clear" @click="() => { clearEntries() }">
+        <img class="btn-clear__icon" :src="iconClear" alt="remove all" />
+        清空
+      </button>
+      <button class="btn-remove-all" @click="() => { removeAllEntries() }">
+        <img class="btn-remove-all__icon" :src="iconRemove" alt="remove all" />
+        删除全部
+      </button>
+    </div>
 
     <div class="hangman-item title-line">
       <div class="hangman-item__no"></div>
@@ -101,9 +137,9 @@ const sortEntries = () => {
       </div>
       <div class="hangman-item__btn">
         <button
-          class="btn-delete"
-          @click="() => { deleteEntry(i) }">
-          <img class="btn-delete__icon" :src="iconDelete" />
+          class="btn-remove-all"
+          @click="() => { removeEntry(i) }">
+          <img class="btn-remove-all__icon" :src="iconRemove" />
         </button>
       </div>
     </div>
@@ -126,12 +162,8 @@ const sortEntries = () => {
       <div class="hangman-item__blank"></div>
       <div class="hangman-item__sort">
         <button class="btn-sort" @click="() => { sortEntries() }">
+          <img class="btn-sort__icon" :src="iconSort" alt="remove all" />
           按长度排序
-        </button>
-      </div>
-      <div class="hangman-item__btn">
-        <button class="btn-add" @click="() => { addEntry() }">
-          <img class="btn-add__icon" :src="iconAdd" alt="add" />
         </button>
       </div>
     </div>
@@ -140,6 +172,9 @@ const sortEntries = () => {
   <div class="hangman-guess">
     <div class="hangman-guess__title">猜测</div>
 
+    <div class="hangman-item__input">
+      <input type="text" v-model="opened" />
+    </div>
   </div>
 
   <div class="hangman-output">
@@ -150,6 +185,7 @@ const sortEntries = () => {
 
 <style lang="sass" scoped>
 @use '../main'
+@use '../mixins'
 
 %card
   padding: 1rem
@@ -165,7 +201,7 @@ const sortEntries = () => {
 %card-title
   position: absolute
   top: -0.75rem
-  padding: 0.25rem
+  padding: 0.125rem 0.25rem
   background-color: var(--color-white)
 
 .hangman-list
@@ -180,9 +216,11 @@ const sortEntries = () => {
   align-items: center
   margin-top: 0.5rem
 
+  &.actions
+    margin-top: 0
+
   &.title-line
     font-size: var(--font-size-sm)
-    margin: 0
 
   &__no
     width: 1.5rem
@@ -203,6 +241,7 @@ const sortEntries = () => {
 
   &__input > input
     flex-grow: 1
+    width: 0
     height: calc(2rem - 2px)
 
   &__select-all
@@ -214,10 +253,24 @@ const sortEntries = () => {
   display: flex
   align-items: center
   justify-content: center
+  column-gap: 0.25rem
+  color: var(--color-white)
 
-%btn__icon
+%btn__icon-md
   width: 1.5rem
   height: 1.5rem
+
+%btn__icon-sm
+  width: 1.25rem
+  height: 1.25rem
+
+.btn-add
+  @extend %btn
+  @include mixins.btn-color-sub
+  width: auto
+
+  &__icon
+    @extend %btn__icon-sm
 
 .btn-guessed
   @extend %btn
@@ -226,7 +279,7 @@ const sortEntries = () => {
     background-color: var(--color-sub)
 
   &__icon
-    @extend %btn__icon
+    @extend %btn__icon-md
 
 .btn-hided
   @extend %btn
@@ -235,49 +288,37 @@ const sortEntries = () => {
     background-color: var(--color-gray)
 
   &__icon
-    @extend %btn__icon
+    @extend %btn__icon-md
 
-.btn-delete
+.btn-remove
   @extend %btn
-  border-color: var(--color-red)
-  background-color: var(--color-red)
-
-  &:hover
-    background-color: var(--color-red-light)
-
-  &:active
-    background-color: var(--color-red-lighter)
+  @include mixins.btn-color-red
 
   &__icon
-    width: 1.25rem
-    height: 1.25rem
+    @extend %btn__icon-sm
 
-.btn-add
-  @extend %btn
-  border-color: var(--color-sub)
-  background-color: var(--color-sub)
-
-  &:hover
-    background-color: var(--color-sub-light)
+.btn-remove-all
+  @extend .btn-remove
+  width: auto
 
   &__icon
-    @extend %btn__icon
+    @extend .btn-remove__icon
+
+.btn-clear
+  @extend %btn
+  @include mixins.btn-color-main
+  width: auto
+
+  &__icon
+    @extend %btn__icon-sm
 
 .btn-sort
-  height: 2rem
-  padding: 0 0.5rem
-  display: flex
-  justify-content: center
-  align-items: center
-  color: var(--color-white)
-  border-color: var(--color-main)
-  background-color: var(--color-main)
+  @extend %btn
+  @include mixins.btn-color-main
+  width: auto
 
-  &:hover
-    background-color: var(--color-main-light)
-
-  &:active
-    background-color: var(--color-main-lighter)
+  &__icon
+    @extend %btn__icon-md
 
 .hangman-guess
   @extend %card
