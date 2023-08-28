@@ -16,6 +16,7 @@ $screen-sm: 640px
   --color-black: #333
   --color-gray: #555
   --color-gray-light: #999
+  --color-gray-lighter: #eee
   --color-white: #fff
 
   --font-size-sm: 14px
@@ -35,6 +36,9 @@ input
 
   &:focus-visible
     outline: 1.5px solid var(--color-black)
+
+  &::placeholder
+    color: var(--color-gray-light)
 
 button
   border: 1px solid var(--color-black)

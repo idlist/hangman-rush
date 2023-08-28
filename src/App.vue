@@ -36,15 +36,15 @@ import { RouterLink, RouterView } from 'vue-router'
 .container
   max-width: var(--content-width)
   padding: 1rem
-  padding-top: 2rem
+  padding-top: 2.5rem
 
   @media (max-width: main.$screen-sm)
     padding: 0.5rem
-    padding-top: 2rem
+    padding-top: 2.5rem
 
 .nav-item
   display: flex
-  padding: 0.5rem
+  padding: 0.75rem
   color: var(--color-white)
   text-decoration: none
 

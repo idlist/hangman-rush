@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 import iconTick from '@/assets/tick.svg'
 import iconHide from '@/assets/hide.svg'
@@ -8,6 +8,7 @@ import iconRemove from '@/assets/remove.svg'
 import iconAdd from '@/assets/add.svg'
 import iconClear from '@/assets/clear.svg'
 import iconSort from '@/assets/sort.svg'
+import iconCopy from '@/assets/copy.svg'
 
 interface HangmanEntry {
   content: string
@@ -20,7 +21,7 @@ const entries = ref<HangmanEntry[]>([
     content: '',
     guessed: false,
     hided: false,
-  }
+  },
 ])
 
 const toggleGuessed = (i: number) => {
@@ -74,9 +75,50 @@ const sortEntries = () => {
   })
 }
 
-// const clear
-
 const opened = ref<string>('')
+
+const clearOpened = () => {
+  opened.value = ''
+}
+
+// https://en.wikipedia.org/wiki/Whitespace_character
+const Whitespaces = [
+  '\u0009', '\u0020', '\u00A0', '\u1680',
+  '\u2000', '\u2001', '\u2002', '\u2003', '\u2004',
+  '\u2005', '\u2006', '\u2007', '\u2008', '\u2009',
+  '\u200A', '\u202F', '\u205F', '\u3000',
+]
+
+const output = computed(() => {
+  let result = `已猜：${opened.value}\n`
+  const checkers = opened.value.toLowerCase()
+
+  entries.value.forEach((e, i) => {
+    if (e.hided || e.content === '') {
+      return
+    }
+
+    let segment = e.guessed ? '√. ' : `${i + 1}. `
+
+    for (const letter of e.content) {
+      if (checkers.includes(letter.toLowerCase())) {
+        segment += letter
+      } else if (Whitespaces.includes(letter)) {
+        segment += letter
+      } else {
+        segment += '*'
+      }
+    }
+
+    result += `${segment}\n`
+  })
+
+  return result.trim()
+})
+
+const copyToClipboard = () => {
+  navigator.clipboard.writeText(output.value)
+}
 </script>
 
 <template>
@@ -137,9 +179,9 @@ const opened = ref<string>('')
       </div>
       <div class="hangman-item__btn">
         <button
-          class="btn-remove-all"
+          class="btn-remove"
           @click="() => { removeEntry(i) }">
-          <img class="btn-remove-all__icon" :src="iconRemove" />
+          <img class="btn-remove__icon" :src="iconRemove" />
         </button>
       </div>
     </div>
@@ -173,13 +215,29 @@ const opened = ref<string>('')
     <div class="hangman-guess__title">猜测</div>
 
     <div class="hangman-item__input">
-      <input type="text" v-model="opened" />
+      <input
+        type="text"
+        v-model="opened"
+        placeholder="这里的字母已经猜过了……" />
+    </div>
+
+    <div class="hangman-item">
+      <button class="btn-copy" @click="() => { copyToClipboard() }">
+        <img class="btn-copy__icon" :src="iconCopy" alt="remove all" />
+        复制到剪贴板
+      </button>
+      <div class="hangman-item__blank"></div>
+      <button class="btn-clear" @click="() => { clearOpened() }">
+        <img class="btn-clear__icon" :src="iconClear" alt="remove all" />
+        清空
+      </button>
     </div>
   </div>
 
   <div class="hangman-output">
     <div class="hangman-output__title">输出</div>
 
+    <pre class="hangman-output__pre">{{ output }}</pre>
   </div>
 </template>
 
@@ -255,6 +313,8 @@ const opened = ref<string>('')
   justify-content: center
   column-gap: 0.25rem
   color: var(--color-white)
+  margin: 0
+  padding: 0.25rem 0.375rem
 
 %btn__icon-md
   width: 1.5rem
@@ -304,7 +364,7 @@ const opened = ref<string>('')
   &__icon
     @extend .btn-remove__icon
 
-.btn-clear
+.btn-clear, .btn-copy
   @extend %btn
   @include mixins.btn-color-main
   width: auto
@@ -331,4 +391,11 @@ const opened = ref<string>('')
 
   &__title
     @extend %card-title
+
+  &__pre
+    margin: 0
+    background-color: var(--color-gray-lighter)
+    border-radius: 0.25rem
+    padding: 0.5rem
+    font-size: var(--font-size-sm)
 </style>

@@ -6,15 +6,15 @@ module.exports = {
   extends: [
     'plugin:vue/vue3-essential',
     'eslint:recommended',
-    '@vue/eslint-config-typescript'
+    '@vue/eslint-config-typescript',
   ],
   parserOptions: {
-    ecmaVersion: 'latest'
+    ecmaVersion: 'latest',
   },
   rules: {
     // Turn off rules
     '@typescript-eslint/no-empty': 'off',
-    '@typescript-eslint/no-var-requires': ' off',
+    '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-empty-interface': 'off',
 
@@ -30,5 +30,5 @@ module.exports = {
     quotes: ['warn', 'single'],
     'comma-dangle': ['warn', 'always-multiline'],
     'arrow-parens': ['warn', 'always'],
-  }
+  },
 }
