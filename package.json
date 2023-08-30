@@ -2,6 +2,17 @@
   "name": "hangman-rush",
   "version": "0.1.0",
   "private": true,
+  "author": "i'DLisT <i@idl.ist> (https://idl.ist)",
+  "license": "MIT",
+  "description": "Helper for competitive multi-hangman.",
+  "homepage": "https://github.com/idlist/hangman-rush#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idlist/hangman-rush.git"
+  },
+  "bugs": {
+    "url": "https://github.com/idlist/hangman-rush/issues"
+  },
   "scripts": {
     "dev": "vite --host",
     "build": "run-p type-check build-only",
